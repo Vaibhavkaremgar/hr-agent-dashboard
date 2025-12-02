@@ -90,6 +90,31 @@ async function runMigrations() {
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    // Create message_logs table
+    await run(`
+      CREATE TABLE IF NOT EXISTS message_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_name TEXT,
+        customer_mobile TEXT,
+        message_type TEXT,
+        message_content TEXT,
+        sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create renewal_reminders table
+    await run(`
+      CREATE TABLE IF NOT EXISTS renewal_reminders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_name TEXT,
+        policy_number TEXT,
+        reminder_type TEXT,
+        reminder_date TEXT,
+        sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+
 
     // Create wallets table
     await run(`
