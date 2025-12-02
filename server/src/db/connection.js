@@ -331,6 +331,24 @@ async function runMigrations() {
       if (!colNames.includes('tp_expiry_date')) {
         await run(`ALTER TABLE insurance_customers ADD COLUMN tp_expiry_date TEXT`);
       }
+      if (!colNames.includes('last_year_premium')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN last_year_premium REAL`);
+      }
+      if (!colNames.includes('cheque_hold')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN cheque_hold TEXT`);
+      }
+      if (!colNames.includes('payment_date')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN payment_date TEXT`);
+      }
+      if (!colNames.includes('cheque_no')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN cheque_no TEXT`);
+      }
+      if (!colNames.includes('cheque_bounce')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN cheque_bounce TEXT`);
+      }
+      if (!colNames.includes('owner_alert_sent')) {
+        await run(`ALTER TABLE insurance_customers ADD COLUMN owner_alert_sent TEXT`);
+      }
     } catch (e) {
       console.log('Column migration check:', e.message);
     }

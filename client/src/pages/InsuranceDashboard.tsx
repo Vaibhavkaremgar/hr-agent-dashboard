@@ -46,6 +46,7 @@ export default function InsuranceDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientConfig, setClientConfig] = useState<any>(null);
+  const isJoban = clientConfig?.key === 'joban';
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,6 +86,7 @@ export default function InsuranceDashboard() {
     tp_expiry_date: '',
     premium_mode: '',
     premium: '',
+    last_year_premium: '',
     vertical: 'motor',
     product: '',
     registration_no: '',
@@ -96,7 +98,12 @@ export default function InsuranceDashboard() {
     policy_doc_link: '',
     thank_you_sent: '',
     reason: '',
-    email: ''
+    email: '',
+    cheque_hold: '',
+    payment_date: '',
+    cheque_no: '',
+    cheque_bounce: '',
+    owner_alert_sent: ''
   });
 
   useEffect(() => {
@@ -373,6 +380,7 @@ export default function InsuranceDashboard() {
         tp_expiry_date: '',
         premium_mode: '',
         premium: '',
+        last_year_premium: '',
         vertical: 'motor',
         product: '',
         registration_no: '',
@@ -384,7 +392,12 @@ export default function InsuranceDashboard() {
         policy_doc_link: '',
         thank_you_sent: '',
         reason: '',
-        email: ''
+        email: '',
+        cheque_hold: '',
+        payment_date: '',
+        cheque_no: '',
+        cheque_bounce: '',
+        owner_alert_sent: ''
       });
       loadData();
     } catch (error) {
@@ -1055,12 +1068,7 @@ export default function InsuranceDashboard() {
         <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
           <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required />
           <Input placeholder="Mobile *" value={newCustomer.mobile_number} onChange={(e) => setNewCustomer({...newCustomer, mobile_number: e.target.value})} required />
-          <div><label className="text-sm text-slate-300 mb-1 block">Insurance Activated Date</label><Input type="date" value={newCustomer.insurance_activated_date} onChange={(e) => setNewCustomer({...newCustomer, insurance_activated_date: e.target.value})} /></div>
-          <div><label className="text-sm text-slate-300 mb-1 block">Renewal Date</label><Input type="date" value={newCustomer.renewal_date} onChange={(e) => setNewCustomer({...newCustomer, renewal_date: e.target.value})} /></div>
-          <div><label className="text-sm text-slate-300 mb-1 block">OD Expiry Date</label><Input type="date" value={newCustomer.od_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, od_expiry_date: e.target.value})} /></div>
-          <div><label className="text-sm text-slate-300 mb-1 block">TP Expiry Date</label><Input type="date" value={newCustomer.tp_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, tp_expiry_date: e.target.value})} /></div>
-          <Input placeholder="Premium Mode" value={newCustomer.premium_mode} onChange={(e) => setNewCustomer({...newCustomer, premium_mode: e.target.value})} />
-          <Input type="number" placeholder="Premium Amount" value={newCustomer.premium} onChange={(e) => setNewCustomer({...newCustomer, premium: e.target.value})} />
+          <Input type="email" placeholder="Email" value={newCustomer.email} onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})} />
           <select className="w-full p-2 border rounded bg-slate-700 text-white" value={newCustomer.vertical} onChange={(e) => setNewCustomer({...newCustomer, vertical: e.target.value})}>
             <option value="motor">🚗 Motor</option>
             <option value="health">🏥 Health</option>
@@ -1071,17 +1079,32 @@ export default function InsuranceDashboard() {
           <Input placeholder="Registration No" value={newCustomer.registration_no} onChange={(e) => setNewCustomer({...newCustomer, registration_no: e.target.value})} />
           <Input placeholder="Current Policy No" value={newCustomer.current_policy_no} onChange={(e) => setNewCustomer({...newCustomer, current_policy_no: e.target.value})} />
           <Input placeholder="Company" value={newCustomer.company} onChange={(e) => setNewCustomer({...newCustomer, company: e.target.value})} />
+          <Input type="number" placeholder="Premium Amount" value={newCustomer.premium} onChange={(e) => setNewCustomer({...newCustomer, premium: e.target.value})} />
+          <Input placeholder="Premium Mode" value={newCustomer.premium_mode} onChange={(e) => setNewCustomer({...newCustomer, premium_mode: e.target.value})} />
+          {isJoban && <Input type="number" placeholder="Last Year Premium" value={newCustomer.last_year_premium} onChange={(e) => setNewCustomer({...newCustomer, last_year_premium: e.target.value})} />}
+          <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Date of Expiry' : 'Renewal Date'}</label><Input type="date" value={newCustomer.renewal_date} onChange={(e) => setNewCustomer({...newCustomer, renewal_date: e.target.value})} /></div>
+          {!isJoban && <div><label className="text-sm text-slate-300 mb-1 block">OD Expiry Date</label><Input type="date" value={newCustomer.od_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, od_expiry_date: e.target.value})} /></div>}
+          <div><label className="text-sm text-slate-300 mb-1 block">TP Expiry Date</label><Input type="date" value={newCustomer.tp_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, tp_expiry_date: e.target.value})} /></div>
+          <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Activated Date' : 'Insurance Activated Date'}</label><Input type="date" value={newCustomer.insurance_activated_date} onChange={(e) => setNewCustomer({...newCustomer, insurance_activated_date: e.target.value})} /></div>
           <select className="w-full p-2 border rounded bg-slate-700 text-white" value={newCustomer.status} onChange={(e) => setNewCustomer({...newCustomer, status: e.target.value})}>
             <option value="pending">Pending</option>
             <option value="done">Done</option>
             <option value="lost">Lost</option>
           </select>
+          {isJoban && (
+            <>
+              <Input placeholder="Cheque Hold" value={newCustomer.cheque_hold} onChange={(e) => setNewCustomer({...newCustomer, cheque_hold: e.target.value})} />
+              <div><label className="text-sm text-slate-300 mb-1 block">Payment Date</label><Input type="date" value={newCustomer.payment_date} onChange={(e) => setNewCustomer({...newCustomer, payment_date: e.target.value})} /></div>
+              <Input placeholder="Cheque No" value={newCustomer.cheque_no} onChange={(e) => setNewCustomer({...newCustomer, cheque_no: e.target.value})} />
+              <Input placeholder="Cheque Bounce" value={newCustomer.cheque_bounce} onChange={(e) => setNewCustomer({...newCustomer, cheque_bounce: e.target.value})} />
+            </>
+          )}
           <Input placeholder="New Policy No" value={newCustomer.new_policy_no} onChange={(e) => setNewCustomer({...newCustomer, new_policy_no: e.target.value})} />
           <Input placeholder="New Company" value={newCustomer.new_company} onChange={(e) => setNewCustomer({...newCustomer, new_company: e.target.value})} />
           <Input placeholder="Policy Doc Link" value={newCustomer.policy_doc_link} onChange={(e) => setNewCustomer({...newCustomer, policy_doc_link: e.target.value})} />
           <Input placeholder="Thank You Sent (Yes/No)" value={newCustomer.thank_you_sent} onChange={(e) => setNewCustomer({...newCustomer, thank_you_sent: e.target.value})} />
-          <Input placeholder="Reason" value={newCustomer.reason} onChange={(e) => setNewCustomer({...newCustomer, reason: e.target.value})} />
-          <Input type="email" placeholder="Email" value={newCustomer.email} onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})} />
+          {isJoban && <Input placeholder="Owner Alert Sent" value={newCustomer.owner_alert_sent} onChange={(e) => setNewCustomer({...newCustomer, owner_alert_sent: e.target.value})} />}
+          {!isJoban && <Input placeholder="Reason" value={newCustomer.reason} onChange={(e) => setNewCustomer({...newCustomer, reason: e.target.value})} />}
           <div className="flex gap-3">
             <Button onClick={handleAddCustomer}>Add Customer</Button>
             <Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
@@ -1099,12 +1122,7 @@ export default function InsuranceDashboard() {
           <div className="space-y-3 max-h-[75vh] overflow-y-auto p-1">
             <Input placeholder="Name" value={editingCustomer.name || ''} onChange={(e) => setEditingCustomer({...editingCustomer, name: e.target.value})} />
             <Input placeholder="Mobile" value={editingCustomer.mobile_number || ''} onChange={(e) => setEditingCustomer({...editingCustomer, mobile_number: e.target.value})} />
-            <div><label className="text-sm text-slate-300 mb-1 block">Insurance Activated Date</label><Input type="date" value={editingCustomer.insurance_activated_date?.includes('/') ? editingCustomer.insurance_activated_date.split('/').reverse().join('-') : editingCustomer.insurance_activated_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, insurance_activated_date: e.target.value})} /></div>
-            <div><label className="text-sm text-slate-300 mb-1 block">Renewal Date</label><Input type="date" value={editingCustomer.renewal_date?.includes('/') ? editingCustomer.renewal_date.split('/').reverse().join('-') : editingCustomer.renewal_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, renewal_date: e.target.value})} /></div>
-            <div><label className="text-sm text-slate-300 mb-1 block">OD Expiry Date</label><Input type="date" value={editingCustomer.od_expiry_date?.includes('/') ? editingCustomer.od_expiry_date.split('/').reverse().join('-') : editingCustomer.od_expiry_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, od_expiry_date: e.target.value})} /></div>
-            <div><label className="text-sm text-slate-300 mb-1 block">TP Expiry Date</label><Input type="date" value={editingCustomer.tp_expiry_date?.includes('/') ? editingCustomer.tp_expiry_date.split('/').reverse().join('-') : editingCustomer.tp_expiry_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, tp_expiry_date: e.target.value})} /></div>
-            <Input placeholder="Premium Mode" value={editingCustomer.premium_mode || ''} onChange={(e) => setEditingCustomer({...editingCustomer, premium_mode: e.target.value})} />
-            <Input type="number" placeholder="Premium" value={editingCustomer.premium || ''} onChange={(e) => setEditingCustomer({...editingCustomer, premium: parseFloat(e.target.value)})} />
+            <Input type="email" placeholder="Email" value={editingCustomer.email || ''} onChange={(e) => setEditingCustomer({...editingCustomer, email: e.target.value})} />
             <select className="w-full p-2 border rounded bg-slate-700 text-white" value={editingCustomer.vertical || 'motor'} onChange={(e) => setEditingCustomer({...editingCustomer, vertical: e.target.value})}>
               <option value="motor">🚗 Motor</option>
               <option value="health">🏥 Health</option>
@@ -1115,17 +1133,32 @@ export default function InsuranceDashboard() {
             <Input placeholder="Registration No" value={editingCustomer.registration_no || ''} onChange={(e) => setEditingCustomer({...editingCustomer, registration_no: e.target.value})} />
             <Input placeholder="Current Policy No" value={editingCustomer.current_policy_no || ''} onChange={(e) => setEditingCustomer({...editingCustomer, current_policy_no: e.target.value})} />
             <Input placeholder="Company" value={editingCustomer.company || ''} onChange={(e) => setEditingCustomer({...editingCustomer, company: e.target.value})} />
+            <Input type="number" placeholder="Premium" value={editingCustomer.premium || ''} onChange={(e) => setEditingCustomer({...editingCustomer, premium: parseFloat(e.target.value)})} />
+            <Input placeholder="Premium Mode" value={editingCustomer.premium_mode || ''} onChange={(e) => setEditingCustomer({...editingCustomer, premium_mode: e.target.value})} />
+            {isJoban && <Input type="number" placeholder="Last Year Premium" value={editingCustomer.last_year_premium || ''} onChange={(e) => setEditingCustomer({...editingCustomer, last_year_premium: e.target.value})} />}
+            <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Date of Expiry' : 'Renewal Date'}</label><Input type="date" value={editingCustomer.renewal_date?.includes('/') ? editingCustomer.renewal_date.split('/').reverse().join('-') : editingCustomer.renewal_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, renewal_date: e.target.value})} /></div>
+            {!isJoban && <div><label className="text-sm text-slate-300 mb-1 block">OD Expiry Date</label><Input type="date" value={editingCustomer.od_expiry_date?.includes('/') ? editingCustomer.od_expiry_date.split('/').reverse().join('-') : editingCustomer.od_expiry_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, od_expiry_date: e.target.value})} /></div>}
+            <div><label className="text-sm text-slate-300 mb-1 block">TP Expiry Date</label><Input type="date" value={editingCustomer.tp_expiry_date?.includes('/') ? editingCustomer.tp_expiry_date.split('/').reverse().join('-') : editingCustomer.tp_expiry_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, tp_expiry_date: e.target.value})} /></div>
+            <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Activated Date' : 'Insurance Activated Date'}</label><Input type="date" value={editingCustomer.insurance_activated_date?.includes('/') ? editingCustomer.insurance_activated_date.split('/').reverse().join('-') : editingCustomer.insurance_activated_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, insurance_activated_date: e.target.value})} /></div>
             <select className="w-full p-2 border rounded bg-slate-700 text-white" value={editingCustomer.status || 'pending'} onChange={(e) => setEditingCustomer({...editingCustomer, status: e.target.value})}>
               <option value="pending">Pending</option>
               <option value="done">Done</option>
               <option value="lost">Lost</option>
             </select>
+            {isJoban && (
+              <>
+                <Input placeholder="Cheque Hold" value={editingCustomer.cheque_hold || ''} onChange={(e) => setEditingCustomer({...editingCustomer, cheque_hold: e.target.value})} />
+                <div><label className="text-sm text-slate-300 mb-1 block">Payment Date</label><Input type="date" value={editingCustomer.payment_date?.includes('/') ? editingCustomer.payment_date.split('/').reverse().join('-') : editingCustomer.payment_date || ''} onChange={(e) => setEditingCustomer({...editingCustomer, payment_date: e.target.value})} /></div>
+                <Input placeholder="Cheque No" value={editingCustomer.cheque_no || ''} onChange={(e) => setEditingCustomer({...editingCustomer, cheque_no: e.target.value})} />
+                <Input placeholder="Cheque Bounce" value={editingCustomer.cheque_bounce || ''} onChange={(e) => setEditingCustomer({...editingCustomer, cheque_bounce: e.target.value})} />
+              </>
+            )}
             <Input placeholder="New Policy No" value={editingCustomer.new_policy_no || ''} onChange={(e) => setEditingCustomer({...editingCustomer, new_policy_no: e.target.value})} />
             <Input placeholder="New Company" value={editingCustomer.new_company || ''} onChange={(e) => setEditingCustomer({...editingCustomer, new_company: e.target.value})} />
             <Input placeholder="Policy Doc Link" value={editingCustomer.policy_doc_link || ''} onChange={(e) => setEditingCustomer({...editingCustomer, policy_doc_link: e.target.value})} />
             <Input placeholder="Thank You Sent" value={editingCustomer.thank_you_sent || ''} onChange={(e) => setEditingCustomer({...editingCustomer, thank_you_sent: e.target.value})} />
-            <Input placeholder="Reason" value={editingCustomer.reason || ''} onChange={(e) => setEditingCustomer({...editingCustomer, reason: e.target.value})} />
-            <Input type="email" placeholder="Email" value={editingCustomer.email || ''} onChange={(e) => setEditingCustomer({...editingCustomer, email: e.target.value})} />
+            {isJoban && <Input placeholder="Owner Alert Sent" value={editingCustomer.owner_alert_sent || ''} onChange={(e) => setEditingCustomer({...editingCustomer, owner_alert_sent: e.target.value})} />}
+            {!isJoban && <Input placeholder="Reason" value={editingCustomer.reason || ''} onChange={(e) => setEditingCustomer({...editingCustomer, reason: e.target.value})} />}
             <div className="flex gap-3">
               <Button onClick={handleUpdateCustomer}>Update Customer</Button>
               <Button variant="outline" onClick={() => setEditingCustomer(null)}>Cancel</Button>
