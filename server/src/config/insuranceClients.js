@@ -62,11 +62,11 @@ const insuranceClients = {
   }
 };
 
-function getClientConfig(userEmail) {
-  const email = (userEmail || '').toLowerCase();
+function getClientConfig(identifier) {
+  const searchStr = (identifier || '').toLowerCase();
   
   for (const [key, config] of Object.entries(insuranceClients)) {
-    if (config.identifier.some(id => email.includes(id))) {
+    if (config.identifier.some(id => searchStr.includes(id))) {
       return { key, ...config };
     }
   }

@@ -4,9 +4,12 @@ const { getClientConfig } = require('../config/insuranceClients');
 const router = express.Router();
 
 // Get client-specific configuration
-router.get('/config', authRequired, (req, res) => {
+router.get('/config', authRequired, async (req, res) => {
   try {
-    const config = getClientConfig(req.user.email);
+    const { get } = require('../db/connection');
+    const user = await get('SELECT company_name, email FROM users WHERE id = ?', [req.user.id]);
+    const identifier = user.company_name || user.email;
+    const config = getClientConfig(identifier);
     res.json({
       clientKey: config.key,
       clientName: config.name,

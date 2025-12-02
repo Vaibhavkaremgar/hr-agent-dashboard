@@ -70,6 +70,7 @@ router.post('/login', async (req, res, next) => {
         name: user.name, 
         role: user.role,
         client_type: user.client_type || 'hr',
+        company_name: user.company_name,
         google_sheet_url: user.google_sheet_url,
         balance: wallet.balance_cents,
         mustChangePassword: user.must_change_password === 1
@@ -88,7 +89,7 @@ router.get('/me', authRequired, async (req, res, next) => {
     const wallet = await walletService.getOrCreateWallet(user.id);
     const isLow = await walletService.isLowBalance(user.id);
 
-    res.json({ ...user, client_type: user.client_type || 'hr', balance: wallet.balance_cents, isLowBalance: isLow, mustChangePassword: user.must_change_password === 1 });
+    res.json({ ...user, client_type: user.client_type || 'hr', company_name: user.company_name, balance: wallet.balance_cents, isLowBalance: isLow, mustChangePassword: user.must_change_password === 1 });
   } catch (error) {
     next(error);
   }
