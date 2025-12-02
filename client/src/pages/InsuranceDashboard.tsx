@@ -46,7 +46,7 @@ export default function InsuranceDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientConfig, setClientConfig] = useState<any>(null);
-  const isJoban = clientConfig?.key === 'joban';
+  const isJoban = clientConfig?.clientKey === 'joban' || clientConfig?.key === 'joban';
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -311,6 +311,7 @@ export default function InsuranceDashboard() {
   const loadClientConfig = async () => {
     try {
       const res = await api.get('/api/insurance-config/config');
+      console.log('Client config loaded:', res.data);
       setClientConfig(res.data);
       SHEET_TAB_NAME = res.data.tabName;
     } catch (error) {
@@ -1063,9 +1064,10 @@ export default function InsuranceDashboard() {
       <Modal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="Add New Customer"
+        title={`Add New Customer ${clientConfig ? `(${clientConfig.name})` : ''}`}
       >
         <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
+          {clientConfig && <div className="text-xs text-slate-400 mb-2">Client: {clientConfig.clientKey || clientConfig.key} | isJoban: {isJoban ? 'Yes' : 'No'}</div>}
           <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required />
           <Input placeholder="Mobile *" value={newCustomer.mobile_number} onChange={(e) => setNewCustomer({...newCustomer, mobile_number: e.target.value})} required />
           <Input type="email" placeholder="Email" value={newCustomer.email} onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})} />
