@@ -6,6 +6,8 @@ WORKDIR /app
 # Copy client code
 COPY client ./client
 COPY server ./server
+COPY data ./data
+
 
 # Install frontend dependencies & build UI
 WORKDIR /app/client
