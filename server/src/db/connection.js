@@ -4,7 +4,7 @@ const fs = require('fs');
 const config = require('../config/env');
 
 // Use DB_PATH from env, resolve relative to server directory
-const dbPath = path.resolve(__dirname, '../..', config.dbPath);
+const dbPath = path.resolve('/app/data/hirehero.db');
 const dbDir = path.dirname(dbPath);
 
 // Ensure data directory exists

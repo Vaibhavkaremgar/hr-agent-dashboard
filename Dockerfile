@@ -8,6 +8,8 @@ COPY client ./client
 COPY server ./server
 COPY data ./data
 
+# Copy your real DB from repo to container
+COPY data/hirehero.db /app/data/hirehero.db
 
 # Install frontend dependencies & build UI
 WORKDIR /app/client

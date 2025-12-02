@@ -46,10 +46,3 @@ Thumbs.db
 ########################################
 # PROJECT-SPECIFIC
 ########################################
-
-# SQLite database files (DO NOT UPLOAD)
-*.db
-*.sqlite
-*.sqlite3
-server/data/*.db
-data/*.db
