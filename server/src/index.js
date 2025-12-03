@@ -47,11 +47,22 @@ app.use('/api/billing/razorpay/webhook', express.raw({ type: 'application/json' 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize database
-runMigrations().catch(err => {
-  console.error('❌ Failed to initialize database:', err);
-  process.exit(1);
-});
+// Initialize database and run migrations
+async function initializeDatabase() {
+  try {
+    await runMigrations();
+    
+    // Run insurance company name migration
+    const migration = require('../migrations/004-set-insurance-company-names');
+    await migration.up();
+    console.log('✅ Insurance company names migration completed');
+  } catch (err) {
+    console.error('❌ Failed to initialize database:', err);
+    process.exit(1);
+  }
+}
+
+initializeDatabase();
 
 // Health check
 app.get('/', (req, res) => {
