@@ -314,6 +314,7 @@ export default function InsuranceDashboard() {
       console.log('🔍 CLIENT CONFIG LOADED:', res.data);
       console.log('🔍 clientKey:', res.data.clientKey);
       console.log('🔍 clientName:', res.data.clientName);
+      console.log('📋 Sheet Headers:', res.data.sheetHeaders);
       setClientConfig(res.data);
       SHEET_TAB_NAME = res.data.tabName;
     } catch (error) {
@@ -1072,10 +1073,9 @@ export default function InsuranceDashboard() {
           {clientConfig && (
             <div className="p-3 bg-blue-500/20 border border-blue-500/50 rounded mb-4">
               <div className="text-sm font-bold text-blue-300">🔍 DEBUG INFO:</div>
-              <div className="text-xs text-blue-200">Client Key: <span className="font-bold">{clientConfig.clientKey}</span></div>
-              <div className="text-xs text-blue-200">Client Name: <span className="font-bold">{clientConfig.clientName}</span></div>
-              <div className="text-xs text-blue-200">isJoban: <span className="font-bold">{isJoban ? 'YES ✅' : 'NO ❌'}</span></div>
-              <div className="text-xs text-blue-200">Expected: {isJoban ? 'Joban fields (Last Year Premium, Cheque)' : 'KMG fields (OD Expiry, Reason)'}</div>
+              <div className="text-xs text-blue-200">Client: <span className="font-bold">{clientConfig.clientName}</span></div>
+              <div className="text-xs text-blue-200">Sheet: <span className="font-bold">{clientConfig.tabName}</span></div>
+              <div className="text-xs text-blue-200">Fields from Sheet: <span className="font-bold">{clientConfig.sheetHeaders?.length || 0} columns</span></div>
             </div>
           )}
           <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required />
