@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "test-db": "node test-db-connection.js",
     "init-db": "node scripts/init-db.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "migrate-insurance": "node run-migration.js"
   },
   "keywords": [
     "hr",

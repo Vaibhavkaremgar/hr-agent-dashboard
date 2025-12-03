@@ -311,7 +311,9 @@ export default function InsuranceDashboard() {
   const loadClientConfig = async () => {
     try {
       const res = await api.get('/api/insurance-config/config');
-      console.log('Client config loaded:', res.data);
+      console.log('🔍 CLIENT CONFIG LOADED:', res.data);
+      console.log('🔍 clientKey:', res.data.clientKey);
+      console.log('🔍 clientName:', res.data.clientName);
       setClientConfig(res.data);
       SHEET_TAB_NAME = res.data.tabName;
     } catch (error) {
@@ -1064,9 +1066,18 @@ export default function InsuranceDashboard() {
       <Modal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title={`Add New Customer ${clientConfig ? `(${clientConfig.name})` : ''}`}
+        title={`Add New Customer ${clientConfig ? `(${clientConfig.clientName})` : ''}`}
       >
         <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
+          {clientConfig && (
+            <div className="p-3 bg-blue-500/20 border border-blue-500/50 rounded mb-4">
+              <div className="text-sm font-bold text-blue-300">🔍 DEBUG INFO:</div>
+              <div className="text-xs text-blue-200">Client Key: <span className="font-bold">{clientConfig.clientKey}</span></div>
+              <div className="text-xs text-blue-200">Client Name: <span className="font-bold">{clientConfig.clientName}</span></div>
+              <div className="text-xs text-blue-200">isJoban: <span className="font-bold">{isJoban ? 'YES ✅' : 'NO ❌'}</span></div>
+              <div className="text-xs text-blue-200">Expected: {isJoban ? 'Joban fields (Last Year Premium, Cheque)' : 'KMG fields (OD Expiry, Reason)'}</div>
+            </div>
+          )}
           <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required />
           <Input placeholder="Mobile *" value={newCustomer.mobile_number} onChange={(e) => setNewCustomer({...newCustomer, mobile_number: e.target.value})} required />
           <Input type="email" placeholder="Email" value={newCustomer.email} onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})} />
