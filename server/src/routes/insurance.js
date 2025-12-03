@@ -207,27 +207,33 @@ router.get('/messages', authRequired, (req, res) => {
 // Sync from Google Sheets
 router.post('/sync/from-sheet', authRequired, async (req, res) => {
   try {
-    let { spreadsheetId, tabName } = req.body;
+    const { get } = require('../db/connection');
     
-    // If no spreadsheetId provided, fetch user's google_sheet_url from database
-    if (!spreadsheetId) {
-      const { get } = require('../db/connection');
-      const user = await get('SELECT google_sheet_url FROM users WHERE id = ?', [req.user.id]);
-      if (user && user.google_sheet_url) {
-        const match = user.google_sheet_url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-        if (match) {
-          spreadsheetId = match[1];
-        }
-      }
+    // Get user's email
+    const user = await get('SELECT email FROM users WHERE id = ?', [req.user.id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
     
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Spreadsheet ID is required. Please add a Google Sheet URL to your account.' });
+    // Determine spreadsheet ID and tab based on email
+    let spreadsheetId, tabName;
+    const email = user.email.toLowerCase();
+    
+    if (email.includes('joban')) {
+      // Joban Putra Insurance
+      spreadsheetId = '1oX5MGRMo6oz87ivTXeMOy6vtIDPJXXawz_lGqmOvUEo';
+      tabName = 'Sheet1';
+    } else {
+      // KMG Insurance (default)
+      spreadsheetId = '1EpMAg1gSXPKr83cTugvGexrqv3Yt5Tb85Re2Shah8mw';
+      tabName = 'updating_input';
     }
 
+    console.log('Syncing from sheet - User:', req.user.id, 'Email:', email, 'Sheet:', spreadsheetId, 'Tab:', tabName);
     const result = await insuranceSync.syncFromSheet(req.user.id, spreadsheetId, tabName);
     res.json(result);
   } catch (error) {
+    console.error('Sync from sheet error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -235,31 +241,34 @@ router.post('/sync/from-sheet', authRequired, async (req, res) => {
 // Sync to Google Sheets
 router.post('/sync/to-sheet', authRequired, async (req, res) => {
   try {
-    let { spreadsheetId, tabName } = req.body;
+    const { get } = require('../db/connection');
     
-    // If no spreadsheetId provided, fetch user's google_sheet_url from database
-    if (!spreadsheetId) {
-      const { get } = require('../db/connection');
-      const user = await get('SELECT google_sheet_url FROM users WHERE id = ?', [req.user.id]);
-      if (user && user.google_sheet_url) {
-        const match = user.google_sheet_url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-        if (match) {
-          spreadsheetId = match[1];
-        }
-      }
+    // Get user's email
+    const user = await get('SELECT email FROM users WHERE id = ?', [req.user.id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
     
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Spreadsheet ID is required. Please add a Google Sheet URL to your account.' });
+    // Determine spreadsheet ID and tab based on email
+    let spreadsheetId, tabName;
+    const email = user.email.toLowerCase();
+    
+    if (email.includes('joban')) {
+      // Joban Putra Insurance
+      spreadsheetId = '1oX5MGRMo6oz87ivTXeMOy6vtIDPJXXawz_lGqmOvUEo';
+      tabName = 'Sheet1';
+    } else {
+      // KMG Insurance (default)
+      spreadsheetId = '1EpMAg1gSXPKr83cTugvGexrqv3Yt5Tb85Re2Shah8mw';
+      tabName = 'updating_input';
     }
 
-    console.log('Syncing to sheet for user:', req.user.id, 'spreadsheetId:', spreadsheetId);
+    console.log('Syncing to sheet - User:', req.user.id, 'Email:', email, 'Sheet:', spreadsheetId, 'Tab:', tabName);
     const result = await insuranceSync.syncToSheet(req.user.id, spreadsheetId, tabName);
     console.log('Sync result:', result);
     res.json(result);
   } catch (error) {
     console.error('Sync to sheet error:', error.message);
-    console.error('Full error:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -83,13 +83,20 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/me', authRequired, async (req, res, next) => {
   try {
-    const user = await get('SELECT id, email, name, role, status, must_change_password, client_type, google_sheet_url FROM users WHERE id = ?', [req.user.id]);
+    const user = await get('SELECT id, email, name, role, status, must_change_password, can_change_password, client_type, google_sheet_url, company_name FROM users WHERE id = ?', [req.user.id]);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const wallet = await walletService.getOrCreateWallet(user.id);
     const isLow = await walletService.isLowBalance(user.id);
 
-    res.json({ ...user, client_type: user.client_type || 'hr', company_name: user.company_name, balance: wallet.balance_cents, isLowBalance: isLow, mustChangePassword: user.must_change_password === 1 });
+    res.json({ 
+      ...user, 
+      client_type: user.client_type || 'hr', 
+      balance: wallet.balance_cents, 
+      isLowBalance: isLow, 
+      mustChangePassword: user.must_change_password === 1,
+      canChangePassword: user.role === 'admin' || user.can_change_password === 1
+    });
   } catch (error) {
     next(error);
   }
@@ -114,8 +121,13 @@ router.post('/change-password', authRequired, async (req, res, next) => {
       return res.status(400).json({ error: 'New password must be at least 6 characters' });
     }
 
-    const user = await get('SELECT password_hash, temp_password FROM users WHERE id = ?', [req.user.id]);
+    const user = await get('SELECT password_hash, temp_password, can_change_password, role FROM users WHERE id = ?', [req.user.id]);
     if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    // Check if user has permission to change password (admins always can)
+    if (user.role !== 'admin' && user.can_change_password === 0) {
+      return res.status(403).json({ error: 'Password change is disabled for your account. Contact administrator.' });
+    }
 
     if (!user.temp_password) {
       const isValid = await bcrypt.compare(currentPassword, user.password_hash);

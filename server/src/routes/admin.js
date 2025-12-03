@@ -15,7 +15,8 @@ router.use(authRequired, requireRole('admin'));
 router.get('/users', async (req, res, next) => {
   try {
     const users = await all(
-      `SELECT u.*, w.balance_cents 
+      `SELECT u.id, u.email, u.name, u.role, u.status, u.client_type, u.google_sheet_url, 
+              u.can_change_password, u.created_at, u.updated_at, w.balance_cents 
        FROM users u 
        LEFT JOIN wallets w ON u.id = w.user_id 
        WHERE u.role = 'client'
@@ -116,12 +117,12 @@ router.delete('/users/:id', async (req, res, next) => {
 
 router.patch('/users/:id', async (req, res, next) => {
   try {
-    const { name, status, password } = req.body;
+    const { name, status, password, can_change_password } = req.body;
     const userId = parseInt(req.params.id, 10);
     
     if (password) {
       const passwordHash = await bcrypt.hash(password, 10);
-      await run('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, userId]);
+      await run('UPDATE users SET password_hash = ?, temp_password = 1, must_change_password = 1 WHERE id = ?', [passwordHash, userId]);
     }
     
     if (name !== undefined) {
@@ -132,7 +133,11 @@ router.patch('/users/:id', async (req, res, next) => {
       await run('UPDATE users SET status = ? WHERE id = ?', [status, userId]);
     }
     
-    const user = await get('SELECT id, email, name, role, status FROM users WHERE id = ?', [userId]);
+    if (can_change_password !== undefined) {
+      await run('UPDATE users SET can_change_password = ? WHERE id = ?', [can_change_password ? 1 : 0, userId]);
+    }
+    
+    const user = await get('SELECT id, email, name, role, status, can_change_password FROM users WHERE id = ?', [userId]);
     res.json(user);
   } catch (error) {
     next(error);
@@ -227,6 +232,46 @@ router.post('/users/:id/refresh-analytics', async (req, res, next) => {
     const analytics = await analyticsService.getClientAnalytics(userId);
     res.json(analytics);
   } catch (error) {
+    next(error);
+  }
+});
+
+// Admin sync client data from Google Sheets
+router.post('/users/:id/sync-from-sheet', async (req, res, next) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const user = await get('SELECT google_sheet_url, client_type FROM users WHERE id = ?', [userId]);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    if (!user.google_sheet_url) {
+      return res.status(400).json({ error: 'No Google Sheet URL configured for this client' });
+    }
+    
+    const sheetIdMatch = user.google_sheet_url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    if (!sheetIdMatch) {
+      return res.status(400).json({ error: 'Invalid Google Sheet URL' });
+    }
+    
+    const sheetId = sheetIdMatch[1];
+    
+    // Sync based on client type
+    if (user.client_type === 'insurance') {
+      const insuranceSync = require('../services/insuranceSync');
+      const { getClientConfig } = require('../config/insuranceClients');
+      const userEmail = await get('SELECT email FROM users WHERE id = ?', [userId]);
+      const clientConfig = getClientConfig(userEmail.email);
+      const result = await insuranceSync.syncFromSheet(userId, clientConfig.spreadsheetId, clientConfig.tabName);
+      return res.json({ success: true, ...result, clientType: 'insurance' });
+    } else {
+      // HR client sync
+      const result = await sheetsService.syncCandidates(userId, sheetId, 'output');
+      return res.json({ success: true, ...result, clientType: 'hr' });
+    }
+  } catch (error) {
+    console.error('Admin sync error:', error);
     next(error);
   }
 });
