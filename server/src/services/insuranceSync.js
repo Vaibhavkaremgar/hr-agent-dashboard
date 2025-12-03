@@ -34,20 +34,30 @@ class InsuranceSyncService {
 
   initAuth() {
     if (this.sheets) return;
-    const hasCreds = !!(config.google.clientEmail && config.google.privateKey && config.google.privateKey.includes('BEGIN PRIVATE KEY'));
+    
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+    
+    const hasCreds = !!(clientEmail && privateKey && privateKey.includes('BEGIN PRIVATE KEY'));
+    
     if (hasCreds) {
       try {
         this.auth = new google.auth.JWT(
-          config.google.clientEmail,
+          clientEmail,
           null,
-          config.google.privateKey,
+          privateKey,
           ['https://www.googleapis.com/auth/spreadsheets']
         );
         this.sheets = google.sheets({ version: 'v4', auth: this.auth });
+        console.log('✅ Google Sheets API initialized successfully');
       } catch (e) {
-        console.error('Google auth init failed:', e?.message || e);
+        console.error('❌ Google auth init failed:', e?.message || e);
         this.sheets = null;
       }
+    } else {
+      console.error('❌ Google Sheets credentials missing or invalid');
+      console.log('Client Email:', clientEmail ? 'Present' : 'Missing');
+      console.log('Private Key:', privateKey ? (privateKey.includes('BEGIN PRIVATE KEY') ? 'Valid' : 'Invalid format') : 'Missing');
     }
   }
 

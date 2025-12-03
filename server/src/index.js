@@ -31,19 +31,15 @@ const insuranceConfigRoutes = require('./routes/insuranceConfig');
 
 const app = express();
 
-// Security and logging
-// app.use(helmet());
-// app.use(cors({ 
-//   origin: config.frontendUrl || 'http://localhost:5173',
-//   credentials: true
-// }));
-
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://hr-agent-dashboard-production-01fd.up.railway.app"
+    "https://hr-agent-dashboard-production-01fd.up.railway.app",
+    "https://hr-agent-dashboard-production.up.railway.app"
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 

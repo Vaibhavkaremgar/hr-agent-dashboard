@@ -7,6 +7,7 @@ import { InsuranceProvider } from './context/InsuranceContext'
 import AppLayout from './components/layout/AppLayout'
 import Spinner from './components/ui/Spinner'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import './styles/mobile-responsive.css'
 
 const LoginPage = lazy(() => import('./pages/Login'))
 const DashboardClient = lazy(() => import('./pages/DashboardClient'))

@@ -1,0 +1,175 @@
+/* Mobile Responsive Styles for Insurance Dashboard */
+
+/* Ensure all modals are mobile-friendly */
+@media (max-width: 768px) {
+  /* Modal adjustments */
+  .modal-content {
+    max-height: 85vh !important;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  /* Form inputs on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 44px; /* Touch-friendly size */
+  }
+
+  /* Table responsiveness */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Button sizing for touch */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Card spacing on mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  /* Grid adjustments */
+  .grid {
+    gap: 0.75rem !important;
+  }
+
+  /* Text sizing */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+
+  h3 {
+    font-size: 1.125rem !important;
+  }
+
+  /* Sidebar on mobile */
+  aside {
+    width: 100% !important;
+    max-width: 280px;
+  }
+
+  /* Stats cards on mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets */
+  a, button, input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Remove hover effects on touch devices */
+  .hover\:bg-slate-700:hover {
+    background-color: inherit;
+  }
+
+  /* Add active states for touch feedback */
+  button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 75vh !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.25rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.125rem !important;
+  }
+
+  /* Compact form spacing */
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* Ensure scrollable areas work on all devices */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Fix for iOS Safari bottom bar */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Prevent text selection on buttons */
+button, .button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling on all devices */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessibility - Focus visible */
+*:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
