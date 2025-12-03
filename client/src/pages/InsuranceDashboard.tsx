@@ -46,7 +46,8 @@ export default function InsuranceDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientConfig, setClientConfig] = useState<any>(null);
-  const isJoban = clientConfig?.clientKey === 'joban' || clientConfig?.key === 'joban';
+  const [sheetFields, setSheetFields] = useState<string[]>([]);
+  const isJoban = clientConfig?.clientKey === 'joban';
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -311,11 +312,10 @@ export default function InsuranceDashboard() {
   const loadClientConfig = async () => {
     try {
       const res = await api.get('/api/insurance-config/config');
-      console.log('🔍 CLIENT CONFIG LOADED:', res.data);
-      console.log('🔍 clientKey:', res.data.clientKey);
-      console.log('🔍 clientName:', res.data.clientName);
-      console.log('📋 Sheet Headers:', res.data.sheetHeaders);
+      console.log('🔍 CLIENT CONFIG:', res.data);
+      console.log('📋 SHEET FIELDS:', res.data.sheetHeaders);
       setClientConfig(res.data);
+      setSheetFields(res.data.sheetHeaders || []);
       SHEET_TAB_NAME = res.data.tabName;
     } catch (error) {
       console.error('Failed to load client config:', error);
@@ -1071,52 +1071,24 @@ export default function InsuranceDashboard() {
       >
         <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
           {clientConfig && (
-            <div className="p-3 bg-blue-500/20 border border-blue-500/50 rounded mb-4">
-              <div className="text-sm font-bold text-blue-300">🔍 DEBUG INFO:</div>
-              <div className="text-xs text-blue-200">Client: <span className="font-bold">{clientConfig.clientName}</span></div>
-              <div className="text-xs text-blue-200">Sheet: <span className="font-bold">{clientConfig.tabName}</span></div>
-              <div className="text-xs text-blue-200">Fields from Sheet: <span className="font-bold">{clientConfig.sheetHeaders?.length || 0} columns</span></div>
+            <div className="p-3 bg-green-500/20 border border-green-500/50 rounded mb-4">
+              <div className="text-sm font-bold text-green-300">✅ {clientConfig.clientName}</div>
+              <div className="text-xs text-green-200">Sheet: {clientConfig.tabName}</div>
+              <div className="text-xs text-green-200">Columns: {sheetFields.join(', ')}</div>
             </div>
           )}
-          <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required />
-          <Input placeholder="Mobile *" value={newCustomer.mobile_number} onChange={(e) => setNewCustomer({...newCustomer, mobile_number: e.target.value})} required />
-          <Input type="email" placeholder="Email" value={newCustomer.email} onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})} />
-          <Input placeholder="Product" value={newCustomer.product} onChange={(e) => setNewCustomer({...newCustomer, product: e.target.value})} />
-          <select className="w-full p-2 border rounded bg-slate-700 text-white" value={newCustomer.vertical} onChange={(e) => setNewCustomer({...newCustomer, vertical: e.target.value})}>
-            <option value="motor">🚗 Motor</option>
-            <option value="health">🏥 Health</option>
-            <option value="non-motor">🏠 Non-Motor</option>
-            <option value="life">👤 Life</option>
-          </select>
-          <Input placeholder={isJoban ? "Policy No" : "Current Policy No"} value={newCustomer.current_policy_no} onChange={(e) => setNewCustomer({...newCustomer, current_policy_no: e.target.value})} />
-          <Input placeholder="Company" value={newCustomer.company} onChange={(e) => setNewCustomer({...newCustomer, company: e.target.value})} />
-          <Input placeholder={isJoban ? "REGN no" : "Registration No"} value={newCustomer.registration_no} onChange={(e) => setNewCustomer({...newCustomer, registration_no: e.target.value})} />
-          {isJoban && <Input type="number" placeholder="Last Year Premium" value={newCustomer.last_year_premium} onChange={(e) => setNewCustomer({...newCustomer, last_year_premium: e.target.value})} />}
-          <Input type="number" placeholder="Premium Amount" value={newCustomer.premium} onChange={(e) => setNewCustomer({...newCustomer, premium: e.target.value})} />
-          <Input placeholder="Premium Mode" value={newCustomer.premium_mode} onChange={(e) => setNewCustomer({...newCustomer, premium_mode: e.target.value})} />
-          <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Date of Expiry' : 'Renewal Date'}</label><Input type="date" value={newCustomer.renewal_date} onChange={(e) => setNewCustomer({...newCustomer, renewal_date: e.target.value})} /></div>
-          <div><label className="text-sm text-slate-300 mb-1 block">TP Expiry</label><Input type="date" value={newCustomer.tp_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, tp_expiry_date: e.target.value})} /></div>
-          {!isJoban && <div><label className="text-sm text-slate-300 mb-1 block">OD Expiry Date</label><Input type="date" value={newCustomer.od_expiry_date} onChange={(e) => setNewCustomer({...newCustomer, od_expiry_date: e.target.value})} /></div>}
-          <div><label className="text-sm text-slate-300 mb-1 block">{isJoban ? 'Activated Date' : 'Insurance Activated Date'}</label><Input type="date" value={newCustomer.insurance_activated_date} onChange={(e) => setNewCustomer({...newCustomer, insurance_activated_date: e.target.value})} /></div>
-          <select className="w-full p-2 border rounded bg-slate-700 text-white" value={newCustomer.status} onChange={(e) => setNewCustomer({...newCustomer, status: e.target.value})}>
-            <option value="pending">Pending</option>
-            <option value="done">Done</option>
-            <option value="lost">Lost</option>
-          </select>
-          <Input placeholder="ThankYouSent" value={newCustomer.thank_you_sent} onChange={(e) => setNewCustomer({...newCustomer, thank_you_sent: e.target.value})} />
-          {isJoban && (
-            <>
-              <Input placeholder="Cheque Hold" value={newCustomer.cheque_hold} onChange={(e) => setNewCustomer({...newCustomer, cheque_hold: e.target.value})} />
-              <div><label className="text-sm text-slate-300 mb-1 block">Payment Date</label><Input type="date" value={newCustomer.payment_date} onChange={(e) => setNewCustomer({...newCustomer, payment_date: e.target.value})} /></div>
-              <Input placeholder="Cheque No" value={newCustomer.cheque_no} onChange={(e) => setNewCustomer({...newCustomer, cheque_no: e.target.value})} />
-              <Input placeholder="Cheque Bounce" value={newCustomer.cheque_bounce} onChange={(e) => setNewCustomer({...newCustomer, cheque_bounce: e.target.value})} />
-            </>
-          )}
-          <Input placeholder="New Policy No" value={newCustomer.new_policy_no} onChange={(e) => setNewCustomer({...newCustomer, new_policy_no: e.target.value})} />
-          <Input placeholder={isJoban ? "New Policy Company" : "New Company"} value={newCustomer.new_company} onChange={(e) => setNewCustomer({...newCustomer, new_company: e.target.value})} />
-          <Input placeholder="Policy doc link" value={newCustomer.policy_doc_link} onChange={(e) => setNewCustomer({...newCustomer, policy_doc_link: e.target.value})} />
-          {isJoban && <Input placeholder="Owner Alert Sent" value={newCustomer.owner_alert_sent} onChange={(e) => setNewCustomer({...newCustomer, owner_alert_sent: e.target.value})} />}
-          {!isJoban && <Input placeholder="Reason" value={newCustomer.reason} onChange={(e) => setNewCustomer({...newCustomer, reason: e.target.value})} />}
+          {sheetFields.map((field, idx) => (
+            <div key={idx}>
+              <label className="text-sm text-slate-300 mb-1 block">{field}</label>
+              <Input 
+                placeholder={field} 
+                value={newCustomer[field] || ''} 
+                onChange={(e) => setNewCustomer({...newCustomer, [field]: e.target.value})} 
+              />
+            </div>
+          ))}
+          <Input placeholder="Name *" value={newCustomer.name} onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})} required style={{display: 'none'}} />
+
           <div className="flex gap-3">
             <Button onClick={handleAddCustomer}>Add Customer</Button>
             <Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button>
