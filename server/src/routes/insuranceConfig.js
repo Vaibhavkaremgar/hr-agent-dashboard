@@ -7,9 +7,8 @@ const router = express.Router();
 router.get('/config', authRequired, async (req, res) => {
   try {
     const { get } = require('../db/connection');
-    const user = await get('SELECT company_name, email FROM users WHERE id = ?', [req.user.id]);
-    const identifier = user.company_name || user.email;
-    const config = getClientConfig(identifier);
+    const user = await get('SELECT email FROM users WHERE id = ?', [req.user.id]);
+    const config = getClientConfig(user.email);
     
     res.json({
       clientKey: config.key,

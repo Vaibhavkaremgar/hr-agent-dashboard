@@ -83,7 +83,7 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/me', authRequired, async (req, res, next) => {
   try {
-    const user = await get('SELECT id, email, name, role, status, must_change_password, can_change_password, client_type, google_sheet_url, company_name FROM users WHERE id = ?', [req.user.id]);
+    const user = await get('SELECT id, email, name, role, status, must_change_password, can_change_password, client_type, google_sheet_url FROM users WHERE id = ?', [req.user.id]);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const wallet = await walletService.getOrCreateWallet(user.id);
