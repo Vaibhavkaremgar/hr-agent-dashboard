@@ -27,6 +27,7 @@ const applicationsRoutes = require('./routes/applications');
 const resumeParserRoutes = require('./routes/resume-parser');
 const insuranceRoutes = require('./routes/insurance');
 const insuranceConfigRoutes = require('./routes/insuranceConfig');
+const messageWebhooksRoutes = require('./routes/messageWebhooks');
 
 
 const app = express();
@@ -59,9 +60,14 @@ async function initializeDatabase() {
     await runMigrations();
     
     // Run insurance company name migration
-    const migration = require('../migrations/004-set-insurance-company-names');
-    await migration.up();
+    const migration004 = require('../migrations/004-set-insurance-company-names');
+    await migration004.up();
     console.log('✅ Insurance company names migration completed');
+    
+    // Run client message tables migration
+    const migration005 = require('../migrations/005-create-client-message-tables');
+    await migration005.up();
+    console.log('✅ Client message tables migration completed');
   } catch (err) {
     console.error('❌ Failed to initialize database:', err);
     process.exit(1);
@@ -106,6 +112,7 @@ app.use('/api/debug', require('./routes/debug'));
 app.use('/api/insurance', insuranceRoutes);
 app.use('/api/insurance-config', insuranceConfigRoutes);
 app.use('/api/policies', require('./routes/policies'));
+app.use('/api/webhooks', messageWebhooksRoutes);
 
 
 // Error handling
