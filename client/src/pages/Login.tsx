@@ -48,7 +48,7 @@ export default function LoginPage() {
       <div className="app-bg" />
       <div className="grid-overlay" />
       <form onSubmit={onSubmit} className="w-full max-w-md card p-6 space-y-4 relative z-10">
-        <h1 className="text-xl font-semibold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">HireHero Login</h1>
+        <h1 className="text-xl font-semibold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Dashboard Login</h1>
         {error && <div className="text-sm text-red-400">{error}</div>}
         {showWarning && (
           <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-3">

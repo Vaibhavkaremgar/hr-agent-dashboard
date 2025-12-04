@@ -15,7 +15,7 @@ export default function WalletBadge() {
   const isLow = data?.is_low_balance || data?.isLowBalance
 
   return (
-    <div className={`px-3 py-1 text-sm rounded-full border transition-colors ${isLow ? 'border-red-400/50 text-red-300 bg-red-500/10' : 'border-emerald-400/50 text-emerald-300 bg-emerald-500/10'}`}>
+    <div className={`px-3 py-1 text-sm rounded-full border transition-colors pointer-events-none ${isLow ? 'border-red-400/50 text-red-300 bg-red-500/10' : 'border-emerald-400/50 text-emerald-300 bg-emerald-500/10'}`}>
       Balance: ₹{balance}
     </div>
   )

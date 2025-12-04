@@ -28,6 +28,7 @@
     min-height: 44px;
     min-width: 44px;
     padding: 0.75rem 1rem;
+    font-size: 0.875rem;
   }
 
   /* Card spacing on mobile */
@@ -40,17 +41,28 @@
     gap: 0.75rem !important;
   }
 
-  /* Text sizing */
+  /* Text sizing - prevent overlap */
   h1 {
-    font-size: 1.5rem !important;
+    font-size: 1.25rem !important;
+    line-height: 1.5 !important;
+    word-wrap: break-word;
   }
 
   h2 {
-    font-size: 1.25rem !important;
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+    word-wrap: break-word;
   }
 
   h3 {
-    font-size: 1.125rem !important;
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+    word-wrap: break-word;
+  }
+
+  p, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   /* Sidebar on mobile */
@@ -62,6 +74,21 @@
   /* Stats cards on mobile */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Prevent text overflow in cards */
+  .card {
+    overflow: hidden;
+  }
+
+  .card * {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  /* Fix flex items wrapping */
+  .flex {
+    flex-wrap: wrap;
   }
 }
 

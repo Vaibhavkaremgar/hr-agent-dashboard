@@ -38,7 +38,7 @@ export const useRazorpay = () => {
           key: orderData.key_id,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: 'HireHero',
+          name: 'Automation Dashboard',
           description: 'Wallet Recharge',
           order_id: orderData.order_id,
           handler: async function (response: any) {

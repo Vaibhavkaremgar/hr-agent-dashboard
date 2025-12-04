@@ -58,7 +58,7 @@ class RazorpayService {
         key: order.key, // Razorpay key from backend
         amount: order.amount,
         currency: order.currency,
-        name: 'HireHero',
+        name: 'Automation Dashboard',
         description: `Wallet Recharge ₹${order.amount / 100}`,
         order_id: order.id,
         prefill: {
