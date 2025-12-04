@@ -10,12 +10,23 @@ export default function MobileSidebar({ open, onClose }: { open: boolean; onClos
       <div onClick={onClose} className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity ${open ? 'opacity-100' : 'opacity-0'}`} />
       <aside className={`absolute left-0 top-0 h-full w-72 bg-slate-900 border-r border-slate-800 p-4 transform transition-transform ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between mb-4">
-          <Link to="/" onClick={onClose} className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">VB Automations</Link>
+          <div className="flex items-center gap-2">
+            {/* Client-specific Logo */}
+            <img 
+              src={user?.email?.toLowerCase().includes('joban') 
+                ? 'https://drive.google.com/uc?export=view&id=1R2CNXhJr0rqnYkML3g4GWKPdaZt8-ffc'
+                : 'https://drive.google.com/uc?export=view&id=1FzuJ03-cQ8VA7fAUDcoz1QW-2_We5FiL'
+              }
+              alt="Logo" 
+              className="h-8 w-auto object-contain"
+            />
+            <Link to="/" onClick={onClose} className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">VB Automations</Link>
+          </div>
           <button onClick={onClose} aria-label="Close" className="p-2 rounded hover:bg-slate-800">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="text-xs text-slate-400 mb-2">{user?.email}</div>
+        <div className="text-xs text-slate-400 mb-2 truncate">{user?.email}</div>
         <nav className="space-y-1 text-sm">
           {user?.role === 'client' && user?.client_type === 'insurance' && (
             <>

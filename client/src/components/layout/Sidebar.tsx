@@ -61,6 +61,17 @@ export default memo(function Sidebar() {
     <aside className="hidden md:block w-[var(--sidebar-width)] border-r border-slate-800/50 bg-slate-900/40 backdrop-blur-xl relative z-10">
       <AIBackground />
       <div className="p-6 border-b border-slate-800/50">
+        {/* Client-specific Logo */}
+        <div className="mb-4 flex justify-center">
+          <img 
+            src={user?.email?.toLowerCase().includes('joban') 
+              ? 'https://drive.google.com/uc?export=view&id=1R2CNXhJr0rqnYkML3g4GWKPdaZt8-ffc'
+              : 'https://drive.google.com/uc?export=view&id=1FzuJ03-cQ8VA7fAUDcoz1QW-2_We5FiL'
+            }
+            alt="Company Logo" 
+            className="h-12 w-auto object-contain"
+          />
+        </div>
         {sidebarTitle && (
           <Link to="/" className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400">
             {sidebarTitle}
