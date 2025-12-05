@@ -69,10 +69,37 @@ async function initializeDatabase() {
     const migration005 = require('../migrations/005-create-client-message-tables');
     await migration005.up();
     console.log('✅ Client message tables migration completed');
+    
+    // Seed admin user
+    await seedAdminUser();
   } catch (err) {
     console.error('❌ Failed to initialize database:', err);
     process.exit(1);
   }
+}
+
+async function seedAdminUser() {
+  const bcrypt = require('bcryptjs');
+  const { get, run } = require('./db/connection');
+  
+  const email = 'vaibhavkar0009@gmail.com';
+  const existing = await get('SELECT * FROM users WHERE email = ?', [email]);
+  
+  if (existing) {
+    console.log('✅ Admin user exists');
+    return;
+  }
+  
+  const passwordHash = await bcrypt.hash('Vaibhav@121', 10);
+  const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/1amZkYzhw2lMmIbw0ftFAw8KJ1SX86zJ2rubWDQgs8CE/edit';
+  
+  const result = await run(
+    'INSERT INTO users (email, password_hash, name, role, google_sheet_url) VALUES (?, ?, ?, ?, ?)',
+    [email, passwordHash, 'Admin', 'admin', googleSheetUrl]
+  );
+  
+  await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [result.lastID, 0]);
+  console.log('✅ Admin user created');
 }
 
 initializeDatabase();
