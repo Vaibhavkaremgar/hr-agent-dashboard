@@ -1,5 +1,5 @@
 # ---------- STAGE 1: Build frontend ----------
-FROM ghcr.io/nodejs/node:18 AS builder
+FROM node:18-bullseye AS builder
 
 WORKDIR /app
 
@@ -13,9 +13,8 @@ WORKDIR /app/client
 RUN npm install
 RUN npm run build
 
-
 # ---------- STAGE 2: Production Server ----------
-FROM ghcr.io/nodejs/node:18
+FROM node:18-bullseye
 
 WORKDIR /app
 
