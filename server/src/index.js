@@ -37,7 +37,7 @@ app.use(cors({
     "http://localhost:5173",
     "https://automations-frontend-production-01fd.up.railway.app",
     "https://hr-agent-dashboard-production-01fd.up.railway.app",
-    "https://automationdash.up.railway.app"
+    "https://hr-agent-dashboard-production.up.railway.app"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -114,6 +114,11 @@ async function seedAdminUser() {
     
     if (existing) {
       console.log(`✅ ${user.name} exists`);
+      const wallet = await get('SELECT * FROM wallets WHERE user_id = ?', [existing.id]);
+      if (!wallet) {
+        await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [existing.id, 1000000]);
+        console.log(`✅ Wallet created for ${user.name}`);
+      }
       continue;
     }
     
