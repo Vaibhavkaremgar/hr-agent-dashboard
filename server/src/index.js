@@ -82,24 +82,51 @@ async function seedAdminUser() {
   const bcrypt = require('bcryptjs');
   const { get, run } = require('./db/connection');
   
-  const email = 'vaibhavkar0009@gmail.com';
-  const existing = await get('SELECT * FROM users WHERE email = ?', [email]);
+  const users = [
+    {
+      email: 'vaibhavkar0009@gmail.com',
+      password: 'Vaibhav@121',
+      name: 'Admin',
+      role: 'admin',
+      client_type: 'hr',
+      google_sheet_url: 'https://docs.google.com/spreadsheets/d/1amZkYzhw2lMmIbw0ftFAw8KJ1SX86zJ2rubWDQgs8CE/edit'
+    },
+    {
+      email: 'kvreddy1809@gmail.com',
+      password: 'kmg123',
+      name: 'KMG Insurance',
+      role: 'client',
+      client_type: 'insurance',
+      google_sheet_url: 'https://docs.google.com/spreadsheets/d/1EpMAg1gSXPKr83cTugvGexrqv3Yt5Tb85Re2Shah8mw/edit'
+    },
+    {
+      email: 'jobanputra@gmail.com',
+      password: 'joban123',
+      name: 'Joban Putra Insurance Shoppe',
+      role: 'client',
+      client_type: 'insurance',
+      google_sheet_url: 'https://docs.google.com/spreadsheets/d/1oX5MGRMo6oz87ivTXeMOy6vtIDPJXXawz_lGqmOvUEo/edit'
+    }
+  ];
   
-  if (existing) {
-    console.log('✅ Admin user exists');
-    return;
+  for (const user of users) {
+    const existing = await get('SELECT * FROM users WHERE email = ?', [user.email]);
+    
+    if (existing) {
+      console.log(`✅ ${user.name} exists`);
+      continue;
+    }
+    
+    const passwordHash = await bcrypt.hash(user.password, 10);
+    
+    const result = await run(
+      'INSERT INTO users (email, password_hash, name, role, client_type, google_sheet_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [user.email, passwordHash, user.name, user.role, user.client_type, user.google_sheet_url, 'active']
+    );
+    
+    await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [result.lastID, 1000000]);
+    console.log(`✅ ${user.name} created`);
   }
-  
-  const passwordHash = await bcrypt.hash('Vaibhav@121', 10);
-  const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/1amZkYzhw2lMmIbw0ftFAw8KJ1SX86zJ2rubWDQgs8CE/edit';
-  
-  const result = await run(
-    'INSERT INTO users (email, password_hash, name, role, google_sheet_url) VALUES (?, ?, ?, ?, ?)',
-    [email, passwordHash, 'Admin', 'admin', googleSheetUrl]
-  );
-  
-  await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [result.lastID, 0]);
-  console.log('✅ Admin user created');
 }
 
 initializeDatabase();
