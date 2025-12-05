@@ -110,27 +110,31 @@ async function seedAdminUser() {
   ];
   
   for (const user of users) {
-    const existing = await get('SELECT * FROM users WHERE email = ?', [user.email]);
-    
-    if (existing) {
-      console.log(`✅ ${user.name} exists`);
-      const wallet = await get('SELECT * FROM wallets WHERE user_id = ?', [existing.id]);
-      if (!wallet) {
-        await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [existing.id, 1000000]);
-        console.log(`✅ Wallet created for ${user.name}`);
+    try {
+      const existing = await get('SELECT * FROM users WHERE email = ?', [user.email]);
+      
+      if (existing) {
+        console.log(`✅ ${user.name} exists`);
+        const wallet = await get('SELECT * FROM wallets WHERE user_id = ?', [existing.id]);
+        if (!wallet) {
+          await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [existing.id, 1000000]);
+          console.log(`✅ Wallet created for ${user.name}`);
+        }
+        continue;
       }
-      continue;
+      
+      const passwordHash = await bcrypt.hash(user.password, 10);
+      
+      const result = await run(
+        'INSERT INTO users (email, password_hash, name, role, client_type, google_sheet_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [user.email, passwordHash, user.name, user.role, user.client_type, user.google_sheet_url, 'active']
+      );
+      
+      await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [result.lastID, 1000000]);
+      console.log(`✅ ${user.name} created`);
+    } catch (err) {
+      console.log(`⚠️ Skipping ${user.name}: ${err.message}`);
     }
-    
-    const passwordHash = await bcrypt.hash(user.password, 10);
-    
-    const result = await run(
-      'INSERT INTO users (email, password_hash, name, role, client_type, google_sheet_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [user.email, passwordHash, user.name, user.role, user.client_type, user.google_sheet_url, 'active']
-    );
-    
-    await run('INSERT INTO wallets (user_id, balance_cents) VALUES (?, ?)', [result.lastID, 1000000]);
-    console.log(`✅ ${user.name} created`);
   }
 }
 
