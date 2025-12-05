@@ -4,12 +4,12 @@ const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export const api = axios.create({ baseURL })
 
-// Token helpers (persist across refresh within the tab)
+// Token helpers (persist across refresh)
 const TOKEN_KEY = 'hirehero_token'
-export function getToken() { return sessionStorage.getItem(TOKEN_KEY) }
+export function getToken() { return localStorage.getItem(TOKEN_KEY) }
 export function setToken(token: string | null) {
-  if (token) sessionStorage.setItem(TOKEN_KEY, token)
-  else sessionStorage.removeItem(TOKEN_KEY)
+  if (token) localStorage.setItem(TOKEN_KEY, token)
+  else localStorage.removeItem(TOKEN_KEY)
 }
 
 // Offline store (in-memory per tab)
