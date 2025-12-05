@@ -35,7 +35,9 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://automations-frontend-production-01fd.up.railway.app"
+    "https://automations-frontend-production-01fd.up.railway.app",
+    "https://hr-agent-dashboard-production-01fd.up.railway.app",
+    "https://automationdash.up.railway.app"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
