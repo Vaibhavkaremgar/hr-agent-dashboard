@@ -1,5 +1,5 @@
 # ---------- STAGE 1: Build frontend ----------
-FROM node:18 AS builder
+FROM ghcr.io/nodejs/node:18 AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm run build
 
 
 # ---------- STAGE 2: Production Server ----------
-FROM node:18
+FROM ghcr.io/nodejs/node:18
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ COPY server ./server
 # Copy built frontend
 COPY --from=builder /app/client/dist ./server/public
 
-# COPY DATABASE INTO FINAL IMAGE (IMPORTANT!)
+# Copy SQLite database folder
 COPY --from=builder /app/data ./data
 
 # Install backend dependencies
